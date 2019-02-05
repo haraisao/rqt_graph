@@ -34,7 +34,7 @@ import rospkg
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QAbstractListModel, QFile, QIODevice, Qt, Signal
-from python_qt_binding.QtGui import QIcon, QImage, QPainter
+from python_qt_binding.QtGui import QIcon, QImage, QPainter, QPixmap
 from python_qt_binding.QtWidgets import QCompleter, QFileDialog, QGraphicsScene, QWidget
 from python_qt_binding.QtSvg import QSvgGenerator
 
@@ -172,21 +172,27 @@ class RosGraph(Plugin):
         self._widget.hide_tf_nodes_check_box.clicked.connect(self._refresh_rosgraph)
         self._widget.group_image_check_box.clicked.connect(self._refresh_rosgraph)
 
-        self._widget.refresh_graph_push_button.setIcon(QIcon.fromTheme('view-refresh'))
+        self._widget.refresh_graph_push_button.setIcon(QIcon.fromTheme('view-refresh',
+                    self.getPixmapIcon('view-refresh')))
         self._widget.refresh_graph_push_button.pressed.connect(self._update_rosgraph)
 
         self._widget.highlight_connections_check_box.toggled.connect(self._redraw_graph_view)
         self._widget.auto_fit_graph_check_box.toggled.connect(self._redraw_graph_view)
-        self._widget.fit_in_view_push_button.setIcon(QIcon.fromTheme('zoom-original'))
+        self._widget.fit_in_view_push_button.setIcon(QIcon.fromTheme('zoom-original',
+                    self.getPixmapIcon('zoom-original')))
         self._widget.fit_in_view_push_button.pressed.connect(self._fit_in_view)
 
-        self._widget.load_dot_push_button.setIcon(QIcon.fromTheme('document-open'))
+        self._widget.load_dot_push_button.setIcon(QIcon.fromTheme('document-open',
+                    self.getPixmapIcon('document-open')))
         self._widget.load_dot_push_button.pressed.connect(self._load_dot)
-        self._widget.save_dot_push_button.setIcon(QIcon.fromTheme('document-save-as'))
+        self._widget.save_dot_push_button.setIcon(QIcon.fromTheme('document-save-as',
+                    self.getPixmapIcon('document-save-as')))
         self._widget.save_dot_push_button.pressed.connect(self._save_dot)
-        self._widget.save_as_svg_push_button.setIcon(QIcon.fromTheme('document-save-as'))
+        self._widget.save_as_svg_push_button.setIcon(QIcon.fromTheme('document-save-as',
+                    self.getPixmapIcon('document-save-as')))
         self._widget.save_as_svg_push_button.pressed.connect(self._save_svg)
-        self._widget.save_as_image_push_button.setIcon(QIcon.fromTheme('image'))
+        self._widget.save_as_image_push_button.setIcon(QIcon.fromTheme('image',
+                    self.getPixmapIcon('image-missing')))
         self._widget.save_as_image_push_button.pressed.connect(self._save_image)
 
         self._update_rosgraph()
@@ -194,6 +200,11 @@ class RosGraph(Plugin):
         self._deferred_fit_in_view.emit()
 
         context.add_widget(self._widget)
+
+    def getPixmapIcon(self, name):
+        rp=rospkg.RosPack()
+        icon_file = os.path.join(rp.get_path('rqt_gui'), 'resource', 'icons', name+'.png')
+        return QIcon(QPixmap(icon_file))
 
     def save_settings(self, plugin_settings, instance_settings):
         instance_settings.set_value(
